@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阿婆的冰箱</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="rotateHint">
+  <div>请横屏打开冰箱</div>
+</div>
+
+<!-- 笔刷描边用的 SVG 滤镜（全局，隐藏） -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="roughen">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="8"/>
+    </filter>
+  </defs>
+</svg>
+
+<div id="frame">
+  <div id="gameTitle">阿婆的冰箱</div>
+  <div id="bgmControl">
+    <button id="bgmToggle" type="button" aria-label="开启 BGM" aria-pressed="false" title="开启 BGM">♪</button>
+    <label id="bgmVolumeWrap" aria-label="BGM 音量">
+      <input id="bgmVolume" type="range" min="0" max="100" value="22">
+    </label>
+  </div>
+
+  <!-- 手绘笔刷黑色描边 -->
+  <svg id="brush" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+    <rect x="9" y="9" width="1902" height="1062" rx="26"/>
+  </svg>
+
+  <div id="stage">
+    <img class="bg" src="res/background.png" alt="">
+
+    <!-- 阿婆 -->
+    <img id="grandma" src="res/grandma.png" alt="阿婆">
+
+    <!-- 物品由 JS 注入 -->
+
+    <!-- 留下/丢弃 两堆 -->
+    <div id="bag" class="pile clickable" title="留下的（点开复盘）"><img src="res/obj_orgin_big/suliaodai.png" alt="购物袋"></div>
+    <div id="bin" class="pile clickable" title="丢弃的（点开复盘）"><img src="res/obj_orgin_big/lajitong2.png" alt="垃圾桶"></div>
+
+    <!-- 系统提示 + 阿婆开场 -->
+    <div id="sysTip" class="bubble noise"></div>
+    <div id="greet" class="bubble noise"></div>
+
+    <!-- 进度 -->
+    <div id="progress"></div>
+
+    <!-- 遮罩：特写卡 / 复盘面板 -->
+    <div id="overlay">
+      <div class="dim"></div>
+
+      <div id="modalBubble" class="bubble noise"></div>
+
+      <div id="modal" class="card noise">
+        <span class="close" data-close>×</span>
+        <img class="pic" src="" alt="">
+        <div class="iname" data-field="name"></div>
+        <div class="idesc" data-field="desc_short"></div>
+        <div class="acts">
+          <button class="choice" data-act="keep">留下来</button>
+          <button class="choice" data-act="skip">再想想</button>
+          <button class="choice" data-act="toss">不要了</button>
+        </div>
+      </div>
+
+      <div id="panel" class="card noise">
+        <span class="close" data-close>×</span>
+        <h3></h3>
+        <div class="list"></div>
+      </div>
+    </div>
+
+    <!-- 结局 -->
+    <div id="ending">
+      <h2>这个冰箱，现在松动了。</h2>
+      <div class="shelf"></div>
+      <div class="poem"></div>
+    </div>
+
+    <!-- 结尾摆放模式 -->
+    <div id="placeMode">
+      <div class="placeShade"></div>
+      <div id="placeTray" class="card noise">
+        <h3>留下的东西</h3>
+        <p>把它们拖回冰箱里</p>
+        <div class="placeList"></div>
+        <div class="placeTools">
+          <button id="place-smaller">缩小</button>
+          <button id="place-larger">放大</button>
+          <button id="place-rot-left">左转</button>
+          <button id="place-rot-right">右转</button>
+        </div>
+        <button id="placeDone" disabled>摆好了</button>
+      </div>
+      <button id="restartGame">重新开始</button>
+      <div id="finishNote" class="card noise">
+        <h3></h3>
+        <p></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 编辑模式工具条 -->
+<div id="edbar">
+  <button id="ed-save">保存到本地</button>
+  <button id="ed-export">导出 JSON</button>
+  <button id="ed-reset">清空本地改动</button>
+  <button id="ed-smaller">缩小</button>
+  <button id="ed-larger">放大</button>
+  <span id="ed-current">未选中</span>
+  <label class="ed-num">X <input id="ed-x" type="number" step="0.1"></label>
+  <label class="ed-num">Y <input id="ed-y" type="number" step="0.1"></label>
+  <label class="ed-num">W <input id="ed-w" type="number" step="0.1"></label>
+  <span class="ed-help">点击选中，拖动摆位，方向键微调，+/- 调大小，双击物品改文案</span>
+</div>
+
+<script src="content.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

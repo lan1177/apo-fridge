@@ -1,0 +1,14 @@
+.DS_Store
+**/.DS_Store
+.git
+.vercel
+output/
+
+# Design references / working notes
+效果图*.png
+交接说明_给codex.md
+阿婆的冰箱_GDD.md
+content-export*.json
+
+# Source BGM kept locally; deployed site uses audio/bgm.mp3
+audio/bgm.m4a
