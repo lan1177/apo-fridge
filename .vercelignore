@@ -12,3 +12,11 @@ content-export*.json
 
 # Source BGM kept locally; deployed site uses audio/bgm.mp3
 audio/bgm.m4a
+
+# Source/unused heavyweight assets kept in git but not needed at runtime
+res/background.png
+res/cursors/hand-cursor-source.png
+res/cursors/hand-cursor-clean-source.png
+res/cursors/hand-cursor.png
+res/cursors/hand-cursor-clean.png
+res/cursors/hand-cursor-plain.png

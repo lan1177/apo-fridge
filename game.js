@@ -26,6 +26,7 @@
     meicaigan: "meicai",
     huanshan: "huaishan"
   };
+  const AUDIO_SRC_BY_ID = id => `audio/${AUDIO_ALIASES[id] || id}.mp3`;
 
   // ---- 内容：基础数据 + localStorage 覆盖 ----
   const base = window.CONTENT;
@@ -131,16 +132,42 @@
     $("#greet").classList.add("hidden");
   }
   let currentAudio = null;
+  const audioCache = new Map();
+  let audioWarmupStarted = false;
+  function warmupItemAudio() {
+    if (audioWarmupStarted) return;
+    audioWarmupStarted = true;
+    const ids = C.items.map(it => it.id);
+    let i = 0;
+    const step = () => {
+      if (i >= ids.length) return;
+      const id = ids[i++];
+      const src = AUDIO_SRC_BY_ID(id);
+      if (!audioCache.has(src)) {
+        const audio = new Audio(src);
+        audio.preload = "auto";
+        audio.load();
+        audioCache.set(src, audio);
+      }
+      setTimeout(step, 260);
+    };
+    const idle = window.requestIdleCallback || (fn => setTimeout(fn, 900));
+    idle(step);
+  }
   function playItemAudio(id) {
-    const file = AUDIO_ALIASES[id] || id;
+    const src = AUDIO_SRC_BY_ID(id);
     if (currentAudio) {
       currentAudio.pause();
       currentAudio.currentTime = 0;
     }
-    currentAudio = new Audio(`audio/${file}.mp3`);
+    currentAudio = audioCache.get(src) || new Audio(src);
+    currentAudio.currentTime = 0;
+    currentAudio.preload = "auto";
+    audioCache.set(src, currentAudio);
     currentAudio.play().catch(err => {
       console.warn("物品语音播放失败", id, err);
     });
+    warmupItemAudio();
   }
 
   let bgmAudio = null;
@@ -194,7 +221,7 @@
     bgmAudio = new Audio(BGM_SRC);
     bgmAudio.loop = true;
     bgmAudio.volume = loadBgmVolume();
-    bgmAudio.preload = "auto";
+    bgmAudio.preload = "none";
     setBgmVolume(bgmAudio.volume);
     bgmWanted = true;
     bgmOn = true;
@@ -849,6 +876,7 @@
   renderStatic();
   applySceneLayout();
   renderItems();
+  warmupItemAudio();
   squircleAll();
   if (EDIT) initEdit();
 })();
